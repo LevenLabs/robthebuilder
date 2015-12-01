@@ -12,7 +12,7 @@
     "nodeunit": "^0.9.1"
   },
   "scripts": {
-    "test": "nodeunit tests",
+    "test": "node tests/test.js",
     "start": "echo \"Error: use 'node run.js' instead to pass flags\" && exit 1"
   },
   "directories": {
