@@ -7,8 +7,9 @@ var path = require('path'),
     compile = require('./lib/compile.js'),
     addMethods = require('./lib/addMethods.js'),
     currentDir = path.join(path.dirname(process.mainModule.filename)),
+    myDir = path.join(path.dirname(module.filename)),
     templatesDir = path.join(currentDir, "templates"),
-    methodsPath = path.resolve(currentDir, './lib/methods'),
+    methodsPath = path.resolve(myDir, './lib/methods'),
     server, rpc;
 
 function onExit(error) {
