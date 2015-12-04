@@ -2,10 +2,21 @@ var assert = require('assert'),
     RPCLib = require('rpclib'),
     flags = require('flags'),
     SkyRPCClient = require('skyrpcclient'),
+    hashParams = require('../../lib/hashParams.js'),
     rpc = new RPCLib(),
     authClientHostname = 'auth-api.services.example',
     postmasterClientHostname = 'postmaster.services.example',
+    paramsToHash = {
+        name: 'ParamName',
+        toEmail: '',
+        user: {
+            name: 'betsy'
+        },
+        toName: ''
+    },
+    hashOfParams = hashParams(paramsToHash),
     robMethods, preMethods;
+require('nowsecs');
 
 // we have to override the postmaster flag first
 flags.defineString('postmaster-addr', '');
@@ -39,10 +50,25 @@ SkyRPCClient.setHostnameHandler(postmasterClientHostname, function(name, params,
             } else if (params.to === 'noname@test') {
                 assert.equal(params.to, 'noname@test');
                 assert.equal(params.toName, undefined);
+            } else if (params.to === 'dup@test' || params.to === 'old@test') {
+                // these are fine
             } else {
                 throw new Error('Invalid to sent to Postmaster.Enqueue: ' + params.to);
             }
             callback(null, {success: true});
+            break;
+        case 'Postmaster.GetLastEmail':
+            if (!params.uniqueID) {
+                throw new Error('Invalid uniqueID sent to Postmaster.GetLastEmail: ' + params.uniqueID);
+            }
+            assert.equal(params.uniqueID, hashOfParams);
+            if (params.to === 'dup@test') {
+                callback(null, {stat: {tsCreated: Date.nowSecs() - 5}});
+            } else if (params.to === 'old@test') {
+                callback(null, {stat: {tsCreated: 100}});
+            } else {
+                callback(null, {stat: null});
+            }
             break;
     }
 });
@@ -50,6 +76,12 @@ SkyRPCClient.setHostnameHandler(postmasterClientHostname, function(name, params,
 exports.addMethods = function(test) {
     robMethods(rpc);
     preMethods(rpc);
+    test.done();
+};
+
+exports.hashParams = function(test) {
+    test.equal(hashParams(paramsToHash), hashOfParams);
+    test.notEqual(hashOfParams, "");
     test.done();
 };
 
@@ -141,9 +173,6 @@ exports['Rob.RenderAndEmail.NoUserID'] = function(test) {
         },
         fromEmail: 'test@test'
     }, function(result) {
-        if (!result.result) {
-            console.log(result);
-        }
         test.equal(result.result.success, true);
         test.equal(result.result.toEmail, 'noname@test');
         test.done();
@@ -180,6 +209,70 @@ exports['Rob.RenderAndEmail.NoEmail'] = function(test) {
     }, function(result) {
         test.equal(result.error.message, 'Invalid params');
         test.equal(result.error.code, -32602);
+        test.done();
+    });
+};
+
+exports['Rob.RenderAndEmail.OldDup'] = function(test) {
+    test.expect(1);
+    rpc.call('Rob.RenderAndEmail', {
+        name: 'test',
+        toEmail: 'old@test',
+        subject: 'Test Email',
+        params: paramsToHash,
+        fromEmail: 'test@test',
+        dupThreshold: 60
+    }, function(result) {
+        test.equal(result.result.success, true);
+        test.done();
+    });
+};
+
+exports['Rob.RenderAndEmail.DupHash'] = function(test) {
+    test.expect(1);
+    rpc.call('Rob.RenderAndEmail', {
+        name: 'test',
+        toEmail: 'dup@test',
+        subject: 'Test Email',
+        params: paramsToHash,
+        fromEmail: 'test@test',
+        dupThreshold: 60
+    }, function(result) {
+        test.equal(result.error.code, 5);
+        test.done();
+    });
+};
+
+exports['Rob.RenderAndEmail.DupHashProvided'] = function(test) {
+    test.expect(1);
+    rpc.call('Rob.RenderAndEmail', {
+        name: 'test',
+        toEmail: 'dup@test',
+        subject: 'Test Email',
+        params: {
+            name: "Something"
+        },
+        fromEmail: 'test@test',
+        uniqueID: hashOfParams,
+        dupThreshold: 60
+    }, function(result) {
+        test.equal(result.error.code, 5);
+        test.done();
+    });
+};
+
+exports['Rob.RenderAndEmail.DupNull'] = function(test) {
+    test.expect(1);
+    rpc.call('Rob.RenderAndEmail', {
+        name: 'test',
+        toEmail: 'old@test',
+        subject: 'Test Email',
+        params: paramsToHash,
+        fromEmail: 'test@test',
+        uniqueID: hashOfParams,
+        dupThreshold: 60
+    }, function(result) {
+        test.equal(result.result.success, true);
         test.done();
     });
 };

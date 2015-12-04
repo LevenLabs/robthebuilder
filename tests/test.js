@@ -1,10 +1,13 @@
 var path = require('path'),
     compile = require('../lib/compile.js'),
+    Log = require('modulelog')('robthebuilder'),
     reporterName = process.env.NODEUNIT_REPORTER || 'default',
     reporter = require('nodeunit').reporters[reporterName],
     templatesDir = path.join(path.dirname(module.filename), 'templates'),
     printDeferredStats = false,
     options = null;
+
+Log.setClass('console');
 
 global.RUN_MODE = 'dev';
 

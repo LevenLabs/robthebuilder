@@ -26,6 +26,7 @@
     "html-minifier": "^1.0.0",
     "lodash": "^3.10.1",
     "modulelog": "^0.2.0",
+    "nowsecs": "0.0.2",
     "portscanner": "^1.0.0",
     "rpclib": "^0.2.2",
     "skyprovider": "^0.2.0",
