@@ -89,6 +89,12 @@ exports.hashParams = function(test) {
     test.done();
 };
 
+/**
+ *
+ * Testing generic Render
+ *
+ */
+
 exports['Rob.Render'] = function(test) {
     test.expect(1);
     rpc.call('Rob.Render', {
@@ -159,11 +165,133 @@ exports['Rob.Render.Subject'] = function(test) {
     });
 };
 
+/**
+ *
+ * Testing toEmail override/fallback
+ *
+ */
+
+exports['Rob.Render.ToEmail'] = function(test) {
+    test.expect(1);
+    rpc.call('Rob.Render', {
+        toEmail: 'top@test',
+        name: 'test_email',
+        params: {}
+    }, function(result) {
+        test.equal(result.result.html, 'top@test');
+        test.done();
+    });
+};
+
+exports['Rob.Render.ToEmail.User'] = function(test) {
+    test.expect(1);
+    rpc.call('Rob.Render', {
+        userID: 1,
+        name: 'test_email',
+        params: {}
+    }, function(result) {
+        test.equal(result.result.html, 'test@test');
+        test.done();
+    });
+};
+
+exports['Rob.Render.ToEmail.UserOverride'] = function(test) {
+    test.expect(1);
+    rpc.call('Rob.Render', {
+        userID: 1,
+        toEmail: 'top@test',
+        name: 'test_email',
+        params: {}
+    }, function(result) {
+        test.equal(result.result.html, 'top@test');
+        test.done();
+    });
+};
+
+exports['Rob.Render.ToEmail.Params'] = function(test) {
+    test.expect(1);
+    rpc.call('Rob.Render', {
+        userID: 1,
+        toEmail: 'top@test',
+        name: 'test_email',
+        params: {
+            toEmail: "params@test"
+        }
+    }, function(result) {
+        test.equal(result.result.html, 'params@test');
+        test.done();
+    });
+};
+
+/**
+ *
+ * Testing toName override/fallback
+ *
+ */
+
+exports['Rob.Render.ToName'] = function(test) {
+    test.expect(1);
+    rpc.call('Rob.Render', {
+        toName: 'topName',
+        name: 'test_name',
+        params: {}
+    }, function(result) {
+        test.equal(result.result.html, 'topName');
+        test.done();
+    });
+};
+
+exports['Rob.Render.ToEmail.User'] = function(test) {
+    test.expect(1);
+    rpc.call('Rob.Render', {
+        userID: 1,
+        name: 'test_name',
+        params: {}
+    }, function(result) {
+        test.equal(result.result.html, 'UserName');
+        test.done();
+    });
+};
+
+exports['Rob.Render.ToEmail.UserOverride'] = function(test) {
+    test.expect(1);
+    rpc.call('Rob.Render', {
+        userID: 1,
+        toName: 'topName',
+        name: 'test_name',
+        params: {}
+    }, function(result) {
+        test.equal(result.result.html, 'topName');
+        test.done();
+    });
+};
+
+exports['Rob.Render.ToEmail.Params'] = function(test) {
+    test.expect(1);
+    rpc.call('Rob.Render', {
+        userID: 1,
+        toName: 'topName',
+        name: 'test_name',
+        params: {
+            toName: "paramsName"
+        }
+    }, function(result) {
+        test.equal(result.result.html, 'paramsName');
+        test.done();
+    });
+};
+
+/**
+ *
+ * Testing RenderAndEmail
+ *
+ */
+
 exports['Rob.RenderAndEmail'] = function(test) {
     test.expect(2);
     rpc.call('Rob.RenderAndEmail', {
-        userID: 1,
         toEmail: 'test2@test',
+        toName: 'UserName',
         name: 'test',
         subject: 'Test Email',
         params: {
@@ -186,6 +314,25 @@ exports['Rob.RenderAndEmail.FallbackEmail'] = function(test) {
         subject: 'Test Email',
         params: {
             name: 'Sup'
+        },
+        fromEmail: 'test@test'
+    }, function(result) {
+        test.equal(result.result.success, true);
+        test.equal(result.result.toEmail, 'test@test');
+        test.done();
+    });
+};
+
+exports['Rob.RenderAndEmail.EmailNoParams'] = function(test) {
+    test.expect(2);
+    rpc.call('Rob.RenderAndEmail', {
+        toEmail: 'test@test',
+        toName: 'UserName',
+        name: 'test',
+        subject: 'Test Email',
+        params: {
+            name: 'Sup',
+            toEmail: 'no@test'
         },
         fromEmail: 'test@test'
     }, function(result) {
@@ -246,20 +393,11 @@ exports['Rob.RenderAndEmail.NoEmail'] = function(test) {
     });
 };
 
-exports['Rob.RenderAndEmail.NoSubject'] = function(test) {
-    test.expect(2);
-    rpc.call('Rob.RenderAndEmail', {
-        name: 'test',
-        params: {
-            name: 'ParamName'
-        },
-        fromEmail: 'test@test'
-    }, function(result) {
-        test.equal(result.error.message, 'Invalid params');
-        test.equal(result.error.code, -32602);
-        test.done();
-    });
-};
+/**
+ *
+ * Testing duplicate RenderAndEmail
+ *
+ */
 
 exports['Rob.RenderAndEmail.OldDup'] = function(test) {
     test.expect(1);
@@ -321,6 +459,27 @@ exports['Rob.RenderAndEmail.DupNull'] = function(test) {
         dupThreshold: 60
     }, function(result) {
         test.equal(result.result.success, true);
+        test.done();
+    });
+};
+
+/**
+ *
+ * Testing subject override/fallback in RenderAndEmail
+ *
+ */
+
+exports['Rob.RenderAndEmail.NoSubject'] = function(test) {
+    test.expect(2);
+    rpc.call('Rob.RenderAndEmail', {
+        name: 'test',
+        params: {
+            name: 'ParamName'
+        },
+        fromEmail: 'test@test'
+    }, function(result) {
+        test.equal(result.error.message, 'Invalid params');
+        test.equal(result.error.code, -32602);
         test.done();
     });
 };

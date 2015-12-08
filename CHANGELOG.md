@@ -2,6 +2,8 @@
 
 ### 0.1.3 ###
 * Allow subject fallback by template
+* Fixed bug where `toName` and `toEmail` were not being set correctly in
+templates
 
 ### 0.1.2 ###
 * Change default logging to console
