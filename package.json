@@ -1,6 +1,6 @@
 {
   "name": "robthebuilder",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A service that handles templating over JSON-RPC",
   "main": "run.js",
   "repository": {
