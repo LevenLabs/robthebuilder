@@ -40,16 +40,20 @@ SkyRPCClient.setHostnameHandler(authClientHostname, function(name, params, callb
 SkyRPCClient.setHostnameHandler(postmasterClientHostname, function(name, params, callback) {
     switch (name) {
         case 'Postmaster.Enqueue':
-            assert.equal(params.subject, 'Test Email');
             if (params.to === 'test@test') {
                 assert.equal(params.to, 'test@test');
                 assert.equal(params.toName, 'UserName');
+                assert.equal(params.subject, 'Test Email');
             } else if (params.to === 'test2@test') {
                 assert.equal(params.to, 'test2@test');
                 assert.equal(params.toName, 'UserName');
+                assert.equal(params.subject, 'Test Email');
             } else if (params.to === 'noname@test') {
                 assert.equal(params.to, 'noname@test');
+                assert.equal(params.subject, 'Test Email');
                 assert.equal(params.toName, undefined);
+            } else if (params.to === 'hello@test') {
+                assert.equal(params.subject, 'hello');
             } else if (params.to === 'dup@test' || params.to === 'old@test') {
                 // these are fine
             } else {
@@ -103,7 +107,7 @@ exports['Rob.Render.InvalidName'] = function(test) {
     test.expect(2);
     rpc.call('Rob.Render', {
         userID: 1,
-        name: '__test__',
+        name: 'doesNotExist',
         params: {}
     }, function(result) {
         test.equal(result.error.message, 'Internal error');
@@ -122,6 +126,35 @@ exports['Rob.Render.NoParam'] = function(test) {
         test.equal(result.error.message, 'Missing required template parameter');
         test.equal(result.error.code, 3);
         test.equal(result.error.data.param, 'name');
+        test.done();
+    });
+};
+
+exports['Rob.Render.Parent'] = function(test) {
+    test.expect(1);
+    rpc.call('Rob.Render', {
+        userID: 1,
+        name: 'test_child',
+        params: {
+            name: 'ParamName'
+        }
+    }, function(result) {
+        test.equal(result.result.html, 'Hello,ParamName');
+        test.done();
+    });
+};
+
+exports['Rob.Render.Subject'] = function(test) {
+    test.expect(2);
+    rpc.call('Rob.Render', {
+        userID: 1,
+        name: 'test_subject',
+        params: {
+            name: 'ParamName'
+        }
+    }, function(result) {
+        test.equal(result.result.html, 'Hello,ParamName');
+        test.equal(result.result.subject, 'hello');
         test.done();
     });
 };
@@ -213,6 +246,21 @@ exports['Rob.RenderAndEmail.NoEmail'] = function(test) {
     });
 };
 
+exports['Rob.RenderAndEmail.NoSubject'] = function(test) {
+    test.expect(2);
+    rpc.call('Rob.RenderAndEmail', {
+        name: 'test',
+        params: {
+            name: 'ParamName'
+        },
+        fromEmail: 'test@test'
+    }, function(result) {
+        test.equal(result.error.message, 'Invalid params');
+        test.equal(result.error.code, -32602);
+        test.done();
+    });
+};
+
 exports['Rob.RenderAndEmail.OldDup'] = function(test) {
     test.expect(1);
     rpc.call('Rob.RenderAndEmail', {
@@ -273,6 +321,22 @@ exports['Rob.RenderAndEmail.DupNull'] = function(test) {
         dupThreshold: 60
     }, function(result) {
         test.equal(result.result.success, true);
+        test.done();
+    });
+};
+
+exports['Rob.RenderAndEmail.FallbackSubject'] = function(test) {
+    test.expect(2);
+    rpc.call('Rob.RenderAndEmail', {
+        toEmail: 'hello@test',
+        name: 'test_subject',
+        params: {
+            name: "Test"
+        },
+        fromEmail: 'test@test'
+    }, function(result) {
+        test.equal(result.result.success, true);
+        test.equal(result.result.toEmail, 'hello@test');
         test.done();
     });
 };

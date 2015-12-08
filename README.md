@@ -71,6 +71,20 @@ For the above metadata example, the parent might look like:
 </body></html>
 ```
 
+You can also specify a subject for emails in the template:
+```
+<!--
+{
+    "params": [
+        "name"
+    ],
+    "subject": "Welcome Email"
+}
+-->
+```
+and if a `subject` is NOT sent with `RenderAndEmail` then it will use the one
+provided by the template.
+
 ## RPC Methods ##
 
 ### Rob.Render ###
@@ -94,9 +108,10 @@ Arguments:
 * `params`: (object) params to send to the template
 * `toName`: (optional string) name of the recipient
 * `toEmail`: (string) address to send the email to
-* `subject`: (string) subject of the email
-* `fromEmail`: (string) address to send the email from. To fallback to
-`--from-email` just send an empty string.
+* `subject`: (optional string) subject of the email. Required unless template
+specifies a subject.
+* `fromEmail`: (optional string) address to send the email from. Required unless
+`--from-email` was specified.
 * `fromName`: (optional string) name of the sender. To fallback to
 `--from-name` don't send this property or send an empty string.
 * `flags`: (optional number) flags to pass along to postmaster for categorizing
