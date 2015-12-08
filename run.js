@@ -32,7 +32,7 @@ flags.defineString('templates-dir', templatesDir, 'directory to load templates f
 flags.defineString('addl-methods-dir', '', 'add additional methods from this directory');
 flags.defineString('from-email', '', 'default the fromEmail to this address');
 flags.defineString('from-name', '', 'default the fromName to this address');
-flags.defineString('logger', 'default', 'the class to use for logging');
+flags.defineString('logger', 'console', 'the class to use for logging');
 flags.defineString('log-level', 'info', 'the log level');
 flags.parse();
 
