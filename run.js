@@ -74,8 +74,10 @@ compile(templatesDir).then(function() {
         advertise(skyapiAddr, port);
     }
 }).catch(function(e) {
-    console.error('Error starting', e);
-    console.error(e.stack);
+    console.error('Error while starting:\n', e);
+    if (e.stack) {
+        console.error(e.stack);
+    }
     server.stop();
     process.exit(1);
 });
