@@ -149,7 +149,21 @@ exports['Rob.Render.Parent'] = function(test) {
         test.done();
     });
 };
-
+/*
+exports['Rob.Render.GrandParent'] = function(test) {
+    test.expect(1);
+    rpc.call('Rob.Render', {
+        userID: 1,
+        name: 'test_grandchild',
+        params: {
+            name: 'ParamName'
+        }
+    }, function(result) {
+        test.equal(result.result.html, 'Hola,ParamName');
+        test.done();
+    });
+};
+*/
 exports['Rob.Render.Subject'] = function(test) {
     test.expect(2);
     rpc.call('Rob.Render', {
