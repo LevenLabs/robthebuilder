@@ -34,6 +34,7 @@ flags.defineString('from-email', '', 'default the fromEmail to this address');
 flags.defineString('from-name', '', 'default the fromName to this address');
 flags.defineString('logger', 'console', 'the class to use for logging');
 flags.defineString('log-level', 'info', 'the log level');
+flags.defineString('priority', '5', 'lower means higher priority in dns');
 flags.parse();
 
 Log.setClass(flags.get('logger'));
@@ -47,7 +48,7 @@ server = new Server(rpc);
 
 function advertise(addr, port) {
     var skyClient = new SkyProvider('ws://' + addr + '/provide'),
-        priority = global.RUN_MODE === 'dev' ? 1 : 5,
+        priority = ~~flags.get('priority') || 5,
         name = 'robthebuilder';
     Log.info('calling provideService', {name: name, port: port, priority: priority, addr: addr});
     skyClient.provideService(name, port, {priority: priority});
