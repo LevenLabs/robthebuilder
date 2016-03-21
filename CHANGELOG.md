@@ -1,5 +1,9 @@
 ## Changelog ##
 
+### 0.2.1 ###
+* Raise timeout
+* Added new --priority flag to set SRV priority
+
 ### 0.2.0 ###
 * Added recursive parent args to make grandparent overriding easier
 * Changed out directory to current directory
