@@ -136,6 +136,22 @@ exports['Rob.Render.NoParam'] = function(test) {
     });
 };
 
+exports['Rob.Render.ParentAlone'] = function(test) {
+    test.expect(1);
+    rpc.call('Rob.Render', {
+        userID: 1,
+        name: 'parent',
+        params: {
+            greeting: 'Hello',
+            delimiter: ',',
+            body: 'ParamName'
+        }
+    }, function(result) {
+        test.equal(result.result.html, 'Hello,ParamName');
+        test.done();
+    });
+};
+
 exports['Rob.Render.Parent'] = function(test) {
     test.expect(1);
     rpc.call('Rob.Render', {
