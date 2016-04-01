@@ -31,5 +31,6 @@
     "rpclib": "^0.2.2",
     "skyprovider": "^0.2.0",
     "skyrpcclient": "^0.1.0"
-  }
+  },
+  "license": "MIT"
 }
