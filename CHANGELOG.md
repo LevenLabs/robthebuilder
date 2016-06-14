@@ -1,5 +1,8 @@
 ## Changelog ##
 
+### 0.3.1 ###
+* Fixed handling of skyapi endpoint if just ip:port
+
 ### 0.3.0 ###
 * Provide a way to pass server middleware
 * Updated dependencies
