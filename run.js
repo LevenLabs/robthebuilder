@@ -1,13 +1,12 @@
 var path = require('path'),
     flags = require('flags'),
     Log = require('modulelog')('robthebuilder'),
-    RPCLib = require('rpclib'),
     Server = require('./lib/server.js'),
     compile = require('./lib/compile.js'),
     addMethods = require('./lib/addMethods.js'),
     currentDir = path.join(path.dirname(process.mainModule.filename)),
     myDir = path.join(path.dirname(module.filename)),
-    templatesDir = path.join(currentDir, "templates"),
+    templatesDir = path.join(currentDir, 'templates'),
     methodsPath = path.resolve(myDir, './lib/methods'),
     server, rpc;
 
@@ -35,8 +34,7 @@ flags.defineString('logger', '', 'the class to use for logging (defaults to cons
 flags.defineString('log-level', '', 'the log level (defaults to info)');
 flags.defineString('priority', '5', 'lower means higher priority in dns');
 
-rpc = new RPCLib();
-server = new Server(rpc);
+server = new Server();
 
 // give someone a chance to provide a callback to provide a server middleware
 setImmediate(function() {
@@ -59,14 +57,14 @@ setImmediate(function() {
 
     compile(templatesDir).then(function() {
         Log.info('compiled templates', {dir: templatesDir});
-        return addMethods(methodsPath, rpc);
+        return addMethods(methodsPath, server.rpc);
     }).then(function(dirAdded) {
         Log.info('added methods', {dir: dirAdded});
         var addlMethodsPath = flags.get('addl-methods-dir');
         if (!addlMethodsPath) {
             return null;
         }
-        return addMethods(path.resolve(currentDir, addlMethodsPath), rpc);
+        return addMethods(path.resolve(currentDir, addlMethodsPath), server.rpc);
     }).then(function(dirAdded) {
         if (dirAdded) {
             Log.info('added methods', {dir: dirAdded});
