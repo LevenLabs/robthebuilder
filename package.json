@@ -23,14 +23,15 @@
     "deferred": "^0.7.5",
     "escape-html": "^1.0.3",
     "flags": "^0.1.3",
-    "html-minifier": "^1.3.0",
-    "lodash": "^3.10.1",
+    "html-minifier": "^2.1.3",
+    "lodash.assign": "^4.0.9",
+    "lodash.template": "^4.2.5",
     "modulelog": "^0.2.2",
     "nowsecs": "0.0.2",
     "portscanner": "^1.0.0",
-    "rpclib": "^0.2.2",
-    "skyprovider": "^0.2.0",
-    "skyrpcclient": "^0.1.0"
+    "rpclib": ">=0.4.0-beta2 <0.5.0",
+    "skyprovider": "^0.2.2",
+    "skyrpcclient": ">=0.3.0-beta4 <0.4.0"
   },
   "license": "MIT"
 }

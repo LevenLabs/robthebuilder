@@ -1,7 +1,6 @@
 var path = require('path'),
     flags = require('flags'),
     Log = require('modulelog')('robthebuilder'),
-    SkyProvider = require('skyprovider'),
     RPCLib = require('rpclib'),
     Server = require('./lib/server.js'),
     compile = require('./lib/compile.js'),
@@ -32,53 +31,65 @@ flags.defineString('templates-dir', templatesDir, 'directory to load templates f
 flags.defineString('addl-methods-dir', '', 'add additional methods from this directory');
 flags.defineString('from-email', '', 'default the fromEmail to this address');
 flags.defineString('from-name', '', 'default the fromName to this address');
-flags.defineString('logger', 'console', 'the class to use for logging');
-flags.defineString('log-level', 'info', 'the log level');
+flags.defineString('logger', '', 'the class to use for logging (defaults to console)');
+flags.defineString('log-level', '', 'the log level (defaults to info)');
 flags.defineString('priority', '5', 'lower means higher priority in dns');
-flags.parse();
-
-Log.setClass(flags.get('logger'));
-Log.setLevel(flags.get('log-level'));
-
-global.RUN_MODE = flags.get('runmode');
-templatesDir = flags.get('templates-dir');
 
 rpc = new RPCLib();
 server = new Server(rpc);
 
-function advertise(addr, port) {
-    var skyClient = new SkyProvider('ws://' + addr + '/provide'),
-        priority = ~~flags.get('priority') || 5,
-        name = 'robthebuilder';
-    Log.info('calling provideService', {name: name, port: port, priority: priority, addr: addr});
-    skyClient.provideService(name, port, {priority: priority});
-}
+// give someone a chance to provide a callback to provide a server middleware
+setImmediate(function() {
+    // if they've already called parse don't call it again
+    if (!flags.isSet('rpc-port')) {
+        flags.parse(null, true);
+    }
 
-compile(templatesDir).then(function() {
-    Log.info('compiled templates', {dir: templatesDir});
-    return addMethods(methodsPath, rpc);
-}).then(function(dirAdded) {
-    Log.info('added methods', {dir: dirAdded});
-    var addlMethodsPath = flags.get('addl-methods-dir');
-    if (!addlMethodsPath) {
-        return null;
+    var logger = flags.get('logger'),
+        logLevel = flags.get('log-level');
+    if (logger) {
+        Log.setClass(logger);
     }
-    return addMethods(path.resolve(currentDir, addlMethodsPath), rpc);
-}).then(function(dirAdded) {
-    if (dirAdded) {
+    if (logger) {
+        Log.setLevel(logLevel);
+    }
+
+    global.RUN_MODE = flags.get('runmode');
+    templatesDir = flags.get('templates-dir');
+
+    compile(templatesDir).then(function() {
+        Log.info('compiled templates', {dir: templatesDir});
+        return addMethods(methodsPath, rpc);
+    }).then(function(dirAdded) {
         Log.info('added methods', {dir: dirAdded});
-    }
-    return server.start(flags.get('rpc-port'));
-}).then(function(port) {
-    var skyapiAddr = flags.get('skyapi-addr');
-    if (skyapiAddr) {
-        advertise(skyapiAddr, port);
-    }
-}).catch(function(e) {
-    console.error('Error while starting:\n', e);
-    if (e.stack) {
-        console.error(e.stack);
-    }
-    server.stop();
-    process.exit(1);
+        var addlMethodsPath = flags.get('addl-methods-dir');
+        if (!addlMethodsPath) {
+            return null;
+        }
+        return addMethods(path.resolve(currentDir, addlMethodsPath), rpc);
+    }).then(function(dirAdded) {
+        if (dirAdded) {
+            Log.info('added methods', {dir: dirAdded});
+        }
+        return server.start(flags.get('rpc-port'));
+    }).then(function() {
+        var skyapiAddr = flags.get('skyapi-addr');
+        if (skyapiAddr && typeof server.setSkyAPIEndpoint === 'function') {
+            server.setSkyAPIEndpoint(skyapiAddr);
+            server.provide('robthebuilder', flags.get('priority'));
+        }
+    }).catch(function(e) {
+        console.error('Error while starting:\n', e);
+        if (e.stack) {
+            console.error(e.stack);
+        }
+        server.stop();
+        process.exit(1);
+    });
 });
+
+module.exports = function(cb) {
+    if (cb) {
+        server = cb(server);
+    }
+};

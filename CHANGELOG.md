@@ -1,5 +1,9 @@
 ## Changelog ##
 
+### 0.3.0 ###
+* Provide a way to pass server middleware
+* Updated dependencies
+
 ### 0.2.1 ###
 * Raise timeout
 * Added new --priority flag to set SRV priority
