@@ -1,5 +1,9 @@
 ## Changelog ##
 
+### 0.4.0 ###
+* Allow custom server to define `server.getRPCClient`
+* Update versions
+
 ### 0.3.1 ###
 * Fixed handling of skyapi endpoint if just ip:port
 
