@@ -1,5 +1,8 @@
 ## Changelog ##
 
+### 0.4.1 ###
+* Added `replyTo` support
+
 ### 0.4.0 ###
 * Allow custom server to define `server.getRPCClient`
 * Update versions
