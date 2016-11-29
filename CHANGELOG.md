@@ -1,5 +1,8 @@
 ## Changelog ##
 
+### 0.4.2 ###
+* Removed timeout waiting for `Postmaster.Enqueue`
+
 ### 0.4.1 ###
 * Added `replyTo` support
 
