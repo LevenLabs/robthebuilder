@@ -1,5 +1,8 @@
 ## Changelog ##
 
+### 0.4.3 ###
+* Fixed handling render errors in RenderAndEmail
+
 ### 0.4.2 ###
 * Removed timeout waiting for `Postmaster.Enqueue`
 

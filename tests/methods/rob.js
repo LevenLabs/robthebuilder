@@ -423,6 +423,22 @@ exports['Rob.RenderAndEmail.NoEmail'] = function(test) {
     });
 };
 
+exports['Rob.RenderAndEmail.NoRenderParams'] = function(test) {
+    test.expect(3);
+    rpc.call('Rob.RenderAndEmail', {
+        toEmail: 'noname@test',
+        name: 'test',
+        subject: 'Test Email',
+        params: {},
+        fromEmail: 'test@test'
+    }, function(result) {
+        test.equal(result.error.message, 'Missing required template parameter');
+        test.equal(result.error.code, 3);
+        test.equal(result.error.data.param, 'name');
+        test.done();
+    });
+};
+
 /**
  *
  * Testing duplicate RenderAndEmail
