@@ -1,5 +1,8 @@
 ## Changelog ##
 
+### 0.5.0###
+* Always generate uniqueID if one isn't sent
+
 ### 0.4.3 ###
 * Fixed handling render errors in RenderAndEmail
 
