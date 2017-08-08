@@ -1,6 +1,9 @@
 ## Changelog ##
 
-### 0.5.0###
+### 0.5.1 ###
+* Randomize uniqueID if no duplication prevention
+
+### 0.5.0 ###
 * Always generate uniqueID if one isn't sent
 
 ### 0.4.3 ###
